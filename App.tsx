@@ -1,37 +1,46 @@
+// Import necessary hooks and functions from React and Firebase libraries
 import { useState, Dispatch, SetStateAction } from "react";
 import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  UserCredential,
+  getAuth,                          // Tool to manage user account
+  createUserWithEmailAndPassword,   // Tool to create a new user with an email and password
+  signInWithEmailAndPassword,       // Tool to sign in a existing user with email and password
+  UserCredential,                   // Info about the user that log in
 } from "firebase/auth";
 
+// This is the main function that runs my app
 export default function App(){
+  // This is where we keep track of the logged-in user (starting as no user: null)
   const [user, setUser] = useState<UserCredential | null>(null);
 
+  // If a user is logged in, show their info on the screen
   if (user) {
     return <div>{JSON.stringify(user)}</div>;
   }
 
+  // I a user is logged in, show the login/signup screen
   return <AuthScreen setUser={setUser} />;
 }
 
+// This is the screen where people can sign up or log in
 const AuthScreen = ({
   setUser,
 }: {
   setUser: Dispatch<SetStateAction<UserCredential | null>>;
 }) => {
-  const [isSignup, setIsSignup] = useState<boolean>(false);
-  const [userEmail, setUserEmail] = useState<string>("");
-  const [userPassword, setUserPassword] = useState<string>("");
-  const [userConfirmPassword, setUserConfirmPassword] = useState<string>("");
+  // These variables keep track of what the user types in the form
+  const [isSignup, setIsSignup] = useState<boolean>(false); // Switches between signup and login 
+  const [userEmail, setUserEmail] = useState<string>("");   // Stores the user's email
+  const [userPassword, setUserPassword] = useState<string>(""); // Stores the user's password 
+  const [userConfirmPassword, setUserConfirmPassword] = useState<string>(""); // Stores the confirm password
 
+  // Resets the input fields back to empty
   const resetValues = () => {
     setUserEmail("");
     setUserPassword("");
     setUserConfirmPassword("");
   };
 
+  // This function tries to create a new user account with email and password 
   const createUser: (
     email: string,
     password: string
@@ -39,18 +48,19 @@ const AuthScreen = ({
     email: string,
     password: string
   ) => {
-    const auth = getAuth();
+    const auth = getAuth(); // Get the Firebase tool to manage users
     try {
+      // Try creating a new user with email and password 
       const createUserAttempt = await createUserWithEmailAndPassword(
         auth,
         email,
         password
       );
 
-      console.log("createUserAttempt =", createUserAttempt);
-      return createUserAttempt;
+      console.log("createUserAttempt =", createUserAttempt); // Show what happens in the console 
+      return createUserAttempt; // If it works, send back the new user's info
     } catch (error) {
-      console.error("error =", error);
+      console.error("error =", error); // If it fails, show the error
     }
   };
 
@@ -71,67 +81,67 @@ const AuthScreen = ({
             Firebase Auth
           </h1>
           <div className="space-y-4">
-          <div>
-            <label className="label">
-              <span className="text-base label-text">Email</span>
-            </label>
-            <input
-              type="text"
-              placeholder="Email Address"
-              className="w=full input-bordered input-primary"
-              value={userEmail}
-              onChange={(e) => {
-                setUserEmail(e.target.value);
-              }}
-            />
-          </div>
-          <div>
-            <label className="label">
-              <span className="text-base label-text">Password</span>
-            </label>
-            <input>
-            type="password"
-            placeholder="Enter Password"
-            className="w-full input input-bordered input-primary"
-            value={userPassword}
-            onChange{(e) => {
-              setUserPassword(e.target.value);
-            }}
-            />
-            </div>
-           {isSignup && (
             <div>
-             <label className="label">
-              <span className="text-base label-text">Confirm Password</span>
-            </label>
-            <input
-              type="password"
-              placeholder="Enter Password"
-              className="w-full input input-bordered input-primary"
-              value={userConfirmPassword}
-              onChange={(e) => {
-                setUserPassword(e.target.value);
-              }}
+              <label className="label">
+                <span className="text-base label-text">Email</span>
+              </label>
+              <input
+                type="text"
+                placeholder="Email Address"
+                className="w=full input-bordered input-primary"
+                value={userEmail}
+                onChange={(e) => {
+                  setUserEmail(e.target.value);
+                }}
               />
+            </div>
+            <div>
+              <label className="label">
+                <span className="text-base label-text">Password</span>
+              </label>
+              <input
+                type="password"
+                placeholder="Enter Password"
+                className="w-full input input-bordered input-primary"
+                value={userPassword}
+                onChange{(e) => {
+                  setUserPassword(e.target.value);
+                }}
+              />
+            </div>
+            {isSignup && (
+              <div>
+                <label className="label">
+                  <span className="text-base label-text">Confirm Password</span>
+                </label>
+                <input
+                  type="password"
+                  placeholder="Enter Password"
+                  className="w-full input input-bordered input-primary"
+                  value={userConfirmPassword}
+                  onChange={(e) => {
+                    setUserPassword(e.target.value);
+                  }}
+                />
               </div>
              )}
-             {/*<a
-              href="#"
-              className="text-xs text-gray-600 hover:underline hover:text-blue-600"
-             >
-              Forget Password?
+             {/* <a
+               href="#"
+               className="text-xs text-gray-600 hover:underline hover:text-blue-600"
+              >
+               Forget Password?
              </a> */}
              <div>
               <button
-              className="btn btn-primary mr-2"
-              onClick={async () => {
-                if (isSignup) return setIsSignup(false);
+                className="btn btn-primary mr-2"
+                onClick={async () => {
+                  if (isSignup) return setIsSignup(false);
 
-                const auth = getAuth();
-                const signInAttempt = await signInWithEmailAndPassword(
-                  auth,
-                  userEmail,
-                  userPassword
+                  const auth = getAuth();
+                  const signInAttempt = await signInWithEmailAndPassword(
+                    auth,
+                    userEmail,
+                    userPassword
                 );
                 console.log("signInAttempt =", signInAttempt);
                 if(signInAttempt){
@@ -140,8 +150,8 @@ const AuthScreen = ({
               }}
             >
               Login
-             </button>
-             <button
+            </button>
+            <button
               className="btn btn-secondary"
               // disabled={
 
@@ -165,7 +175,7 @@ const AuthScreen = ({
                   resetValues();
                   return alert("check input values...");
                 }
-
+                
                 console.log("createUserPayload =", createUserPayload);
 
                 if (
@@ -192,7 +202,7 @@ const AuthScreen = ({
           </div>
         </div>
       </div>
-    </div>
-  </div>
+    </div>  
+  </div> 
  );
 };
